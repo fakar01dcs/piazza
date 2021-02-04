@@ -24,7 +24,7 @@ class Post(models.Model):
         return self.title
 
 class Interaction(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, limit_choices_to={'status': 'LIVE'})
     name = models.CharField(max_length=60)
     like = models.BooleanField(default=False)
     dislike = models.BooleanField(default=False)
