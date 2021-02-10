@@ -13,4 +13,5 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
     )          
     class Meta:
         model = Post
-        fields = ('title','topic','message_body','total_likes', 'total_dislikes', 'total_comments')
+        fields = ('title','topic','message_body','total_likes', 'total_dislikes',
+         'total_comments', 'timestamp', 'expiration', 'status')

@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Post(models.Model):
@@ -8,17 +11,17 @@ class Post(models.Model):
         ('SPORT', 'Sport'),
         ('TECH','Tech')
     )
-    STATUS_CHOICES = (
-        ('LIVE', 'Live'),
-        ('EXPIRED', 'Expired')
-    )
     title = models.CharField(max_length=60)
     topic = models.CharField(max_length=8, choices=TOPIC_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
     message_body = models.TextField()
-    expiration = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=7, choices=STATUS_CHOICES)
     name = models.CharField(max_length=60)
+
+    def expiration(self):
+        return self.timestamp + timedelta(days=1)
+
+    def status(self):
+        return 'LIVE' if timezone.now() < (self.timestamp + timedelta(days=1)) else 'EXPIRED'
 
     def __str__(self):
         return self.title
