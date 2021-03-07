@@ -1,15 +1,12 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 
-from django.db.models import Sum, Aggregate, CharField
-from django.shortcuts import render
+from django.db.models import Sum, Aggregate, CharField, F, Func, Case, Value, When
+from django.utils import timezone
 
 # Create your views here.
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from .serializers import PostSerializer, InteractionSerializer, TopicSerializer
 from .models import Post, Interaction, Topic
-from rest_framework.response import Response
-
-from django.db.models import Aggregate, CharField, F, Func
  
 class Concat(Aggregate):
     """ORM is used to group other fields. This is equivalent to group_concat"""
@@ -29,21 +26,16 @@ class PostsViewSet(viewsets.ModelViewSet):
         return Post.objects.annotate(
             total_likes = Sum('interaction__like'),
             total_dislikes = Sum('interaction__dislike'),
-            total_comments = Concat('interaction__comment')
-            #status = Func(F('post__timestamp'), F('post__expiration_time_minutes'), function='status')
-        )
-    """
-    def status(timestamp, expiration_time):
-        if timestamp + timedelta(minutes=expiration_time):
-            return 'Live'
-        else:
-            return 'Expired'
-    """
+            total_comments = Concat('interaction__comment'),
+            status = Case(
+                When(timestamp__lt=timezone.make_aware(datetime.now()) - F('expiration_time'), then=Value('Expired')),
+                default=Value('Live'),
+                output_field=CharField()
+        ))  
     queryset = Post.objects.all().order_by('name')
     serializer_class = PostSerializer
 
 class InteractionsViewSet(viewsets.ModelViewSet):
-
     queryset = Interaction.objects.all().order_by('name')
     serializer_class = InteractionSerializer
 
