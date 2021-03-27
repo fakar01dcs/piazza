@@ -1,3 +1,8 @@
+"""
+View methods here have been adapted from lab4 Cloud Computing
+"""
+
+
 from django.shortcuts import render
 
 # Create your views here.

@@ -8,8 +8,10 @@ from rest_framework import viewsets
 from .serializers import PostSerializer, InteractionSerializer, TopicSerializer
 from .models import Post, Interaction, Topic
  
+
 class Concat(Aggregate):
-    """ORM is used to group other fields. This is equivalent to group_concat"""
+    """Group concat function to concat strings of comments into a list, found at
+     https://stackoverflow.com/questions/10340684/group-concat-equivalent-in-django/40478702#40478702"""
     function = 'GROUP_CONCAT'
     template = '%(function)s(%(distinct)s%(expressions)s)'
  
@@ -22,6 +24,8 @@ class Concat(Aggregate):
 
 
 class PostsViewSet(viewsets.ModelViewSet):
+    """Define the viewset for posts, with additional annotations for total likes, 
+    dislikes, comments and status"""
     def get_queryset(self):
         return Post.objects.annotate(
             total_likes = Sum('interaction__like'),
